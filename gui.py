@@ -23,9 +23,9 @@ page1 =\
         html.Div(children = [
             html.Div(children = [
                 dcc.Upload(
-                    id = 'D25file',
+                    id = 'bearing_file_upload',
                     children = html.Div( ['Drag and Drop or ', html.A('Select Files')], style =  {'position' : 'relative','top':'14px'} ),
-                    multiple = True,
+                    multiple = False,
                     style = {
                         'position' : 'relative',
                         'top' : '40px',
@@ -72,7 +72,8 @@ page1 =\
                         'top' : '30px',
                         'left' : '10px'
                     }
-                )],
+                )
+                ],
                 
                 style = {
                     # 'borderStyle' : 'dashed',
@@ -83,7 +84,7 @@ page1 =\
                 className = 'three columns'
             ),
 
-                
+            # the frequence domain file
             dcc.Graph(id='fig1',figure={}, className = 'nine columns')],
             className = 'row'
         ),
@@ -92,8 +93,8 @@ page1 =\
         # {'data' : ...., 'layout' : .....}
         html.Div(children = [
                 # html.Div(children = dcc.Graph(figure=fig, className = 'four columns')), 
-            dcc.Graph(id='fig2',figure=fig1, className = 'six columns'),
-            dcc.Graph(id='fig3',figure=fig2, className = 'six columns')],
+            dcc.Graph(id='fig2',figure={}, className = 'six columns'),
+            dcc.Graph(id='fig3',figure={}, className = 'six columns')],
             className = 'row',
         ),
 
@@ -180,8 +181,8 @@ page2 =\
 app.layout = html.Div(children=[
     html.Div(html.H1(children='Dashboard'), className = 'row'),
 
-    # 這裡的style是internel css style
-    # <h1 style="text-align:center;color:red">......</h1> 的概念
+    # the style here is internal CSS style
+    # example : <h1 style="text-align:center;color:red">......</h1> 
     # html.Div(children=' Dash: A web application framework for Python.', 
             # style = {'text-align':'center','color':'red'}, className = 'row'),
 
@@ -200,11 +201,41 @@ app.layout = html.Div(children=[
 from dash.dependencies import Output, Input, State
 @app.callback(
     # the instant name and instant value
-    [Output(component_id = 'fig1', component_property = 'figure')],
-    [Input(component_id = 'funcSelect', component_property = 'value')]
-)
+    [
+        Output(component_id = 'fig1', component_property = 'figure'),
+        Output(component_id = 'fig2', component_property = 'figure'),
+        Output(component_id = 'fig3', component_property = 'figure')],
+    [Input(component_id = 'funcSelect', component_property = 'value'), Input('bearing_file_upload', 'contents')],
+    [State('bearing_file_upload', 'filename'), State('bearing_file_upload', 'last_modified')])
+def upload_file(opt, contents, filename, filedates):
+    global mainfile
+    if filename is None:
+        return {},{},{}
+    elif filename.endswith('.npy'):
+        sourcefile = np.load('/Users/nicole/Downloads/Formal/'+filename)
+        print(sourcefile.shape)
+    elif filename.endswith('.csv'):
+        sourcefile = pd.read_csv(filename)
+    elif filename.endswith('.xlsx'):
+        sourcefile = pd.read_excel(filename)
+    else:
+        # print('Filetype Not Support')
+        print('filename = ',filename)
+        print('option = ', opt)
+        return None,
+    
+    mainfile = np.array(sourcefile).reshape(-1)
+
+    # fig = drawGraph(opt)
+    fig1 = drawGraph(0)
+    fig2 = drawGraph(1)
+    fig3 = drawGraph(2)
+
+    return fig1, fig2, fig3
+
 def drawGraph(opt):
     data = mainfile.copy()
+    print(mainfile.shape)
     # time domain
     if opt == 0:
         # data = data[:4096]
@@ -219,10 +250,11 @@ def drawGraph(opt):
     # envelope
     elif opt == 2:
         data = data[:1000]
+        fig = px.line(data)
     # print(data)
 
-    # 要加逗號, 需要是tuple型態
-    return fig,
+    # must add comma, to be an tuple
+    return fig
 
 @app.callback(Output('pages_content', 'children'),
               [Input('tabs', 'value')])
@@ -234,5 +266,10 @@ def render_content(tab):
 
 
 
+        
+
+
 if __name__ == '__main__':
+    #app.run_server(host = '', debug=True)
     app.run_server(debug=True)
+
