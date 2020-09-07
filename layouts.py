@@ -51,7 +51,7 @@ loadfile_div = \
 
 
         html.Button('Load', 
-            id='button', 
+            id='load_btn', 
             style = {
                 'position' : 'relative',
                 'top' : '80px',
