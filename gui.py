@@ -12,6 +12,8 @@ import os
 # outlier detect
 from sklearn.ensemble import IsolationForest
 
+from layouts import page1_div, page2_div
+
 # add in persistence=True dcc to prevent refresh while switching https://dash.plotly.com/persistence
 
 
@@ -28,189 +30,9 @@ fig1 = px.line(mainfile, title = 'Frequency Domain')
 fig2 = px.line(mainfile, title = 'Envolope')
 # fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
 
-page1 =\
-    html.Div(id = 'page1', children = [
-        html.Div(children = [
-            html.Div(children = [
-                dcc.Upload(
-                    id = 'bearing_file_upload',
-                    children = html.Div( ['Drag and Drop or ', html.A('Select Files')], style =  {'position' : 'relative','top':'14px'} ),
-                    multiple = False,
-                    style = {
-                        'position' : 'relative',
-                        'top' : '40px',
-                        'left' : '20px',
-                        'width' : '250px',
-                        'height' : '60px',
-                        'textAlign': 'center',
-                        'borderStyle' : 'dashed',
-                        'background-color' : '#ffffff',
-                        'font-style': 'italic',
-                        'font-weight' : 'bold'
-                    }
-                ),
-                html.Div(id = 'fileinfo', children = [
-                    dcc.Markdown('''
-                        #### Dash and Markdown
-
-                        Dash supports [Markdown](http://commonmark.org/help).
-
-                        Markdown is a simple way to write and format text.
-                        It includes a syntax for things like **bold text** and *italics*,
-                        [links](http://commonmark.org/help), inline `code` snippets, lists,
-                        quotes, and more.
-                    ''')],
-                    style = {
-                        'position' : 'relative',
-                        'top' : '60px',
-                        'background-color' : '#f0f0f5',
-                        'width' : '280px',
-                        'height' : '200px',
-                        'left' : '15px',
-                        # 'text-align' : 'center'
-                    }
-                ),
 
 
-                html.Button('Load', 
-                    id='button', 
-                    style = {
-                        'position' : 'relative',
-                        'top' : '80px',
-                        'left' : '200px',
-                        'background-color' : 'white',
-                        'height' : '80px'
-                    }
-                ),
-                # dcc.RadioItems(
-                #     options=[
-                #         {'label': 'Origianl', 'value': '0'},
-                #         {'label': 'Drop Outlier', 'value': '1'}
-                #     ],
-                #     value='0',
-                #     labelStyle={'display': 'inline-block'},
-                #     style = {
-                #         'position' : 'relative',
-                #         'top' : '30px',
-                #         'left' : '10px'
-                #     }
-                # )
-                # relative : compare with original position
-                daq.BooleanSwitch(
-                    id='outlier_detect',
-                    label = 'Enable Outlier Detection',
-                    labelPosition = 'top',
-                    on=False,
-                    style = {
-                        'position' : 'relative',
-                        'top' : '0px',
-                        'right' : '50px'
-                    }
-                )
 
-            ],
-                
-                style = {
-                    # 'borderStyle' : 'dashed',
-                    'background-color' : '#e1e1ea',
-                    'height' : '450px',
-                    # 'left' : '100px'
-                },
-                className = 'three columns'
-            ),
-
-            # the frequence domain file
-            dcc.Graph(id='fig1',figure={}, className = 'nine columns')],
-            className = 'row'
-        ),
-
-    
-        # {'data' : ...., 'layout' : .....}
-        html.Div(children = [
-                # html.Div(children = dcc.Graph(figure=fig, className = 'four columns')), 
-            dcc.Graph(id='fig2',figure={}, className = 'six columns'),
-            dcc.Graph(id='fig3',figure={}, className = 'six columns')],
-            className = 'row',
-        ),
-
-        html.Div(children = [
-                    # html.Div(
-            dcc.Dropdown(
-                id = 'funcSelect',
-                options = [
-                    {'label':'Time Domain', 'value':0},
-                    {'label':'Frequence Domain', 'value':1},
-                    {'label':'Evenlope', 'value':2}
-                ],
-                multi = False,
-                value = 0,
-                style = {
-                    'text-align' : 'center',
-                    'position' : 'relative',
-                    'top' : '40px',
-                    # 'background-color' : '#FFD382',
-                },
-                persistence=True
-        
-            )],
-            className = 'row',
-        )]
-    )
-
-page2 =\
-    html.Div(id = 'page2', children = [
-        
-    html.Div(children = [
-        html.Div(children = [
-            dcc.Dropdown(
-                options=[
-                    {'label': '500 RPM', 'value': '500'},
-                    {'label': '1000 RPM', 'value': '1000'},
-                    {'label': '2000 RPM', 'value': '2000'}
-                ],
-                value='500',
-                style = {
-                    'position' : 'relative',
-                    'top' : '20px',
-                    'left' : '20px',
-                    'width' : '250px',
-                    'height' : '60px',
-                    'textAlign': 'center',
-                    # 'background-color' : '#ffffff',
-                }
-            ),  
-
-            html.Button('Classifly', id='button', 
-                style = {
-                    'position' : 'relative',
-                    'top' : '250px',
-                    'left' : '150px',
-                    'background-color' : 'white',
-                    'height' : '80px'
-                    }
-            )],
-
-                
-            style = {
-                # 'borderStyle' : 'dashed',
-                    'background-color' : '#e1e1ea',
-                    'height' : '450px',
-                    # 'left' : '100px'
-                },
-                className = 'three columns'
-        ),
-        # not fit layout
-        # html.Div('',style = {
-        #     'weight' : '10px',
-        #     'height' : '600px',
-        #     'background-color' : '#e6f3ff'
-        # })
-        ],
-        # dcc.Graph(id='fig1',figure={}, className = 'nine columns')],
-
-        className = 'row'
-    )
-])
 
 
 
@@ -227,7 +49,7 @@ app.layout = html.Div(children=[
         dcc.Tab(label='Load Data and Draw', value='tab-1'),
         dcc.Tab(label='Classification', value='tab-2')
     ]),
-    html.Div(id='pages_content', children = page1)
+    html.Div(id='pages_content', children = page1_div)
 
 ])
 
@@ -242,9 +64,9 @@ from dash.dependencies import Output, Input, State
         Output(component_id = 'fig2', component_property = 'figure'),
         Output(component_id = 'fig3', component_property = 'figure'),
         Output(component_id = 'fileinfo', component_property = 'children')],
-    [Input(component_id = 'funcSelect', component_property = 'value'), Input('bearing_file_upload', 'contents')],
+    [Input('bearing_file_upload', 'contents')],
     [State('bearing_file_upload', 'filename'), State('bearing_file_upload', 'last_modified')])
-def upload_file(opt, contents, filename, filedates):
+def upload_file(contents, filename, filedates):
     global mainfile
     if filename is None:
         return {},{},{},[]
@@ -307,9 +129,9 @@ def drawGraph(opt):
               [Input('tabs', 'value')])
 def render_content(tab):
     if tab == 'tab-1':
-        return page1
+        return page1_div
     elif tab == 'tab-2':
-        return page2
+        return page2_div
 
 def outlier_detect(data):
     data = data.copy()
