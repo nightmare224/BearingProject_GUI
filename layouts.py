@@ -3,13 +3,35 @@ import dash_core_components as dcc
 import dash_daq as daq
 import dash_html_components as html
 
+from datetime import datetime as dt
 
 import callbacks
 
-
+fileinfo =  dcc.Textarea(
+    id='fileinfo',
+    value='Textarea content initialized\nwith multiple lines of text',
+    
+    disabled = True,
+    style={
+        'width': '100%',
+        'height': 200,
+        'position' : 'relative',
+        'top' : '60px',
+        'background-color' : '#f0f0f5'
+    },
+    persistence = True
+)
 
 loadfile_div = \
     html.Div(children = [
+######### Enable dateselect when database is done
+        # dcc.DatePickerSingle(
+        #     id='date-picker-single',
+        #     date=dt(2020, 9, 1),
+        #     style = {
+        #         'font-family' : 'Courier New'
+        #     }
+        # ),
         dcc.Upload(
             id = 'bearing_file_upload',
             children = html.Div( ['Drag and Drop or ', html.A('Select Files')], style =  {'position' : 'relative','top':'14px'} ),
@@ -27,28 +49,29 @@ loadfile_div = \
                 'font-weight' : 'bold'
             }
         ),
-        html.Div(id = 'fileinfo', children = [
-            dcc.Markdown('''
-                #### Dash and Markdown
+        # html.Div(id = 'fileinfo', children = [
+        #     dcc.Markdown('''
+        #         #### Dash and Markdown
 
-                Dash supports [Markdown](http://commonmark.org/help).
+        #         Dash supports [Markdown](http://commonmark.org/help).
 
-                Markdown is a simple way to write and format text.
-                It includes a syntax for things like **bold text** and *italics*,
-                [links](http://commonmark.org/help), inline `code` snippets, lists,
-                quotes, and more.
-            ''')],
-            style = {
-                'position' : 'relative',
-                'top' : '60px',
-                'background-color' : '#f0f0f5',
-                'width' : '280px',
-                'height' : '200px',
-                'left' : '15px',
-                # 'text-align' : 'center'
-            }
-        ),
-
+        #         Markdown is a simple way to write and format text.
+        #         It includes a syntax for things like **bold text** and *italics*,
+        #         [links](http://commonmark.org/help), inline `code` snippets, lists,
+        #         quotes, and more.
+        #     ''')],
+        #     style = {
+        #         'position' : 'relative',
+        #         'top' : '60px',
+        #         'background-color' : '#f0f0f5',
+        #         'width' : '280px',
+        #         'height' : '200px',
+        #         'left' : '15px',
+        #         # 'font-family' : 'Courier New'
+        #         # 'text-align' : 'center'
+        #     }
+        # ),
+        fileinfo,
 
         html.Button('Load', 
             id='load_btn', 
@@ -80,10 +103,12 @@ loadfile_div = \
             label = 'Enable Outlier Detection',
             labelPosition = 'top',
             on=False,
+            persistence = True,
             style = {
                 'position' : 'relative',
                 'top' : '0px',
-                'right' : '50px'
+                'right' : '50px',
+                # 'font-family' : 'Courier New'
             }
         )
     ],
@@ -141,7 +166,22 @@ page2_div =\
                 }
             ),  
 
-            html.Button('Classifly', id='button', 
+            # html.Div(id = 'fileinfo_page2', children = [],
+            #     style = {
+            #         'position' : 'relative',
+            #         'top' : '60px',
+            #         'background-color' : '#f0f0f5',
+            #         'width' : '280px',
+            #         'height' : '200px',
+            #         'left' : '15px',
+            #         # 'font-family' : 'Courier New'
+            #         # 'text-align' : 'center'
+            #     }
+            # ),
+            fileinfo,
+
+
+            html.Button('Classify', id='button', 
                 style = {
                     'position' : 'relative',
                     'top' : '250px',
@@ -172,3 +212,5 @@ page2_div =\
         className = 'row'
     )
 ])
+
+# intermediate_div = html.Div(id = 'intermediate', style = {'display' : 'none'})

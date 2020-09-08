@@ -16,16 +16,19 @@ from app import app
 # file upload and show file information
 
 
+
+
 @app.callback(
     # the instant name and instant value
-    [Output(component_id = 'fileinfo', component_property = 'children')],
+    # [Output(component_id = 'fileinfo', component_property = 'children')],
+    [Output(component_id = 'fileinfo', component_property = 'value')],
     [Input('bearing_file_upload', 'contents')],
-    [State('bearing_file_upload', 'filename'), State('bearing_file_upload', 'last_modified')])
+    [State('bearing_file_upload', 'filename'), State('bearing_file_upload', 'last_modified')]
+)
 def upload_file(contents, filename, filedates):
-    global mainfile, Filename
-    Filename = filename
+    global mainfile
     if filename is None:
-        return [],
+        return '',
     elif filename.endswith('.npy') | filename.endswith('.csv') | filename.endswith('.xlsx'):
         pass
     else:
@@ -34,9 +37,11 @@ def upload_file(contents, filename, filedates):
     
 
 
-    fileinfo = [html.Li('Filename : {}'.format(filename)), 
-                html.Li('Last Modified : {}'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(filedates)))), 
-                html.Li('Data Size : {:.2f} MB'.format(os.stat('./Formal/'+filename)[-4]/1024/1024))]
+    # fileinfo = [html.Li('Filename : {}'.format(filename)), 
+    #             html.Li('Last Modified : {}'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(filedates)))), 
+    #             html.Li('Data Size : {:.2f} MB'.format(os.stat('./Formal/'+filename)[-4]/1024/1024))]
+    fileinfo = 'Filename : {}\n\nLast Modified : {}\n\nData Size : {:.2f} MB\n\n'.format(filename, 
+    time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(filedates)), os.stat('./Formal/'+filename)[-4]/1024/1024)
 
     # print(len(contents))
 
@@ -51,40 +56,45 @@ def upload_file(contents, filename, filedates):
         Output(component_id = 'fig1', component_property = 'figure'),
         Output(component_id = 'fig2', component_property = 'figure'),
         Output(component_id = 'fig3', component_property = 'figure')],
-    [Input('load_btn', 'n_clicks')]
+    [Input('load_btn', 'n_clicks')],
+    [State('bearing_file_upload', 'filename'), State('outlier_detect', 'on')]
 )
-def load_file(n_clicks):
+def load_file(n_clicks, filename, outlier_detect_en):
+    print(filename)
     print("n clicks = ", n_clicks)
-    if n_clicks == 0:
-        return {},{},{}
+    print("outlier toggle = ", outlier_detect_en)
+    print('state : ', State('bearing_file_upload', 'filename'))
 
-    global mainfile, Filename
-    if Filename is None:
+
+    # read file
+    if filename is None:
         return {},{},{}
-    elif Filename.endswith('.npy'):
-        sourcefile = np.load('./Formal/'+Filename)
+    elif filename.endswith('.npy'):
+        sourcefile = np.load('./Formal/'+filename)
         print(sourcefile.shape)
-    elif Filename.endswith('.csv'):
-        sourcefile = pd.read_csv(Filename)
-    elif Filename.endswith('.xlsx'):
-        sourcefile = pd.read_excel(Filename)
+    elif filename.endswith('.csv'):
+        sourcefile = pd.read_csv(filename)
+    elif filename.endswith('.xlsx'):
+        sourcefile = pd.read_excel(filename)
     else:
         print('Filetype Not Support')
-        # print('filename = ',filename)
-        # print('option = ', opt)
         return None,
     
+    # format file
     mainfile = np.array(sourcefile).reshape(-1)
+    if outlier_detect_en:
+        mainfile = drop_outlier(mainfile)
 
-    fig1 = drawGraph(0)
-    fig2 = drawGraph(1)
-    fig3 = drawGraph(2)
+    # plot figure of the file
+    fig1 = drawGraph(0, mainfile)
+    fig2 = drawGraph(1, mainfile)
+    fig3 = drawGraph(2, mainfile)
 
     return fig1, fig2, fig3
 
-def drawGraph(opt):
+def drawGraph(opt, mainfile):
     data = mainfile.copy()
-    print(mainfile.shape)
+    # print(mainfile.shape)
     # time domain
     if opt == 0:
         data = data[:4096]
@@ -106,7 +116,19 @@ def drawGraph(opt):
     return fig
 
 
-def outlier_detect(data):
+# @app.callback(
+#     [
+#         Output(component_id = 'fig1', component_property = 'figure'),
+#         Output(component_id = 'fig2', component_property = 'figure'),
+#         Output(component_id = 'fig3', component_property = 'figure')]
+#     [Input('bearing_file_upload', 'contents')],
+#     [State('bearing_file_upload', 'filename'), State('bearing_file_upload', 'last_modified')])
+# )
+# def update_figs():
+#     return {}, {}, {}
+
+
+def drop_outlier(data):
     data = data.copy()
     IF = IsolationForest()
     IF.fit(data.reshape(-1,1))
@@ -114,3 +136,5 @@ def outlier_detect(data):
     data = data[outlier==1]
 
     return data
+
+

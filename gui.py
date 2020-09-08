@@ -24,7 +24,7 @@ fig2 = px.line(mainfile, title = 'Envolope')
 
 
 app.layout = html.Div(children=[
-    html.Div(html.H1(children='Dashboard'), className = 'row'),
+    html.Div(html.H1(children='Bearing Fault Dashboard'), className = 'row'),
 
     # the style here is internal CSS style
     # example : <h1 style="text-align:center;color:red">......</h1> 
@@ -47,9 +47,9 @@ app.layout = html.Div(children=[
               [Input('tabs', 'value')])
 def render_content(tab):
     if tab == 'tab-1':
-        return page1_div
+        return page1_div,
     elif tab == 'tab-2':
-        return page2_div
+        return page2_div,
 
 
 
