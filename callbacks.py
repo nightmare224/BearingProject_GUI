@@ -14,38 +14,38 @@ from app import app
 
 
 # file upload and show file information
+app.config['suppress_callback_exceptions'] = True
 
 
+# can't not add change tab here, or when change to tab2, here will be trigger too
+# foo div did not trigger when change tab
 
 
 @app.callback(
     # the instant name and instant value
     # [Output(component_id = 'fileinfo', component_property = 'children')],
     [Output(component_id = 'fileinfo', component_property = 'value'), Output(component_id = 'memory-output', component_property = 'data')],
-    [Input('bearing_file_upload', 'contents')],
-    [State('bearing_file_upload', 'filename'), State('bearing_file_upload', 'last_modified')]
+    [Input('tab_change', 'children'), Input('bearing_file_upload', 'contents')],
+    [State('bearing_file_upload', 'filename'), State('bearing_file_upload', 'last_modified'), State(component_id = 'memory-output', component_property = 'data')]
 )
-def upload_file(contents, filename, filedates):
-    if filename is None:
-        return None, {}
-    elif filename.endswith('.npy') | filename.endswith('.csv') | filename.endswith('.xlsx'):
-        pass
-    else:
-        print('Filetype Not Support')
-        return '', {}
-    
-
-
-    # fileinfo = [html.Li('Filename : {}'.format(filename)), 
-    #             html.Li('Last Modified : {}'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(filedates)))), 
-    #             html.Li('Data Size : {:.2f} MB'.format(os.stat('./Formal/'+filename)[-4]/1024/1024))]
-    fileinfo_dict = {'Filename' : filename, 'Last Modified': time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(filedates)),\
+def upload_file(foo, contents, filename, filedates, fileinfo_mem):
+    print(foo, filename, fileinfo_mem)
+    # filename will be None when switch the tab
+    # fileinfo_mem will be None initially
+    if (fileinfo_mem != {}) & (fileinfo_mem is not None):
+        fileinfo_dict = fileinfo_mem
+    elif (filename is not None) and (filename.endswith('.npy') | filename.endswith('.csv') | filename.endswith('.xlsx')):
+        fileinfo_dict = {'Filename' : filename, 'Last Modified': time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(filedates)),\
                     'Data Size' : os.stat('./Formal/'+filename)[-4]/1024/1024}
+    else:
+        # add new branceh : filetype not support in future
+        return '', {}
+
 
     fileinfo = 'Filename : {}\n\nLast Modified : {}\n\nData Size : {:.2f} MB\n\n'.format(
                 fileinfo_dict['Filename'], fileinfo_dict['Last Modified'], fileinfo_dict['Data Size'])
 
-    # print(len(contents))
+
 
     return fileinfo, fileinfo_dict
 
@@ -53,17 +53,17 @@ def upload_file(contents, filename, filedates):
 
 
 
-@app.callback(
-    [Output(component_id = 'fileinfo_page2', component_property = 'value')],
-    [Input('memory-output', 'data')],
-)
-def update_page2(fileinfo_dict):
-    # print(data)
+# @app.callback(
+#     [Output(component_id = 'fileinfo_page2', component_property = 'value')],
+#     [Input('memory-output', 'data')],
+# )
+# def update_page2(fileinfo_dict):
+#     # print(data)
 
-    fileinfo = 'Filename : {}\n\nLast Modified : {}\n\nData Size : {:.2f} MB\n\n'.format(
-                fileinfo_dict['Filename'], fileinfo_dict['Last Modified'], fileinfo_dict['Data Size'])
+#     fileinfo = 'Filename : {}\n\nLast Modified : {}\n\nData Size : {:.2f} MB\n\n'.format(
+#                 fileinfo_dict['Filename'], fileinfo_dict['Last Modified'], fileinfo_dict['Data Size'])
 
-    return fileinfo,
+#     return fileinfo,
 
 
 @app.callback(

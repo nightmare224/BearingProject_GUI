@@ -22,7 +22,8 @@ import callbacks
 #     persistence = True
 # )
 
-tab_change = dcc.Store(id='memory-output')
+fileinfo_mem = dcc.Store(id = 'memory-output')
+tab_change = html.Div(id = 'tab_change', children = 'foo', style = {'display' : 'none'})
 
 loadfile_div = \
     html.Div(children = [
@@ -75,7 +76,7 @@ loadfile_div = \
         # ),
         dcc.Textarea(
             id='fileinfo',
-            value='Textarea content initialized\nwith multiple lines of text',
+            value='',
             
             disabled = True,
             style={
@@ -194,7 +195,7 @@ page2_div =\
             #     }
             # ),
             dcc.Textarea(
-                id='fileinfo_page2',
+                id='fileinfo',
                 value='Textarea content initialized\nwith multiple lines of text',
                 
                 disabled = True,
@@ -228,6 +229,11 @@ page2_div =\
                 },
                 className = 'three columns'
         ),
+        # foo
+        dcc.Upload(
+            id = 'bearing_file_upload',
+            style = {'display' : 'none'}
+        )
         # not fit layout
         # html.Div('',style = {
         #     'weight' : '10px',
