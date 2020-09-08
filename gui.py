@@ -13,7 +13,7 @@ import os
 from sklearn.ensemble import IsolationForest
 
 from app import app
-from layouts import page1_div, page2_div
+from layouts import page1_div, page2_div, tab_change
 
 mainfile = np.load('./Formal/Cage_Break.npy').reshape(-1)
 fig1 = px.line(mainfile, title = 'Frequency Domain')
@@ -36,15 +36,19 @@ app.layout = html.Div(children=[
         dcc.Tab(label='Load Data and Draw', value='tab-1'),
         dcc.Tab(label='Classification', value='tab-2')
     ]),
-    html.Div(id='pages_content', children = page1_div)
+    html.Div(id='pages_content', children = page1_div),
+    # a html.Div
+    tab_change
 
 ])
 
 
 
 
-@app.callback(Output('pages_content', 'children'),
-              [Input('tabs', 'value')])
+@app.callback(
+    [Output('pages_content', 'children')],
+    [Input('tabs', 'value')]
+)
 def render_content(tab):
     if tab == 'tab-1':
         return page1_div,

@@ -7,20 +7,22 @@ from datetime import datetime as dt
 
 import callbacks
 
-fileinfo =  dcc.Textarea(
-    id='fileinfo',
-    value='Textarea content initialized\nwith multiple lines of text',
+# fileinfo =  dcc.Textarea(
+#     id='fileinfo',
+#     value='Textarea content initialized\nwith multiple lines of text',
     
-    disabled = True,
-    style={
-        'width': '100%',
-        'height': 200,
-        'position' : 'relative',
-        'top' : '60px',
-        'background-color' : '#f0f0f5'
-    },
-    persistence = True
-)
+#     disabled = True,
+#     style={
+#         'width': '100%',
+#         'height': 200,
+#         'position' : 'relative',
+#         'top' : '60px',
+#         'background-color' : '#f0f0f5'
+#     },
+#     persistence = True
+# )
+
+tab_change = dcc.Store(id='memory-output')
 
 loadfile_div = \
     html.Div(children = [
@@ -71,7 +73,20 @@ loadfile_div = \
         #         # 'text-align' : 'center'
         #     }
         # ),
-        fileinfo,
+        dcc.Textarea(
+            id='fileinfo',
+            value='Textarea content initialized\nwith multiple lines of text',
+            
+            disabled = True,
+            style={
+                'width': '100%',
+                'height': 200,
+                'position' : 'relative',
+                'top' : '60px',
+                'background-color' : '#f0f0f5'
+            },
+            persistence = True
+        ),
 
         html.Button('Load', 
             id='load_btn', 
@@ -178,7 +193,20 @@ page2_div =\
             #         # 'text-align' : 'center'
             #     }
             # ),
-            fileinfo,
+            dcc.Textarea(
+                id='fileinfo_page2',
+                value='Textarea content initialized\nwith multiple lines of text',
+                
+                disabled = True,
+                style={
+                    'width': '100%',
+                    'height': 200,
+                    'position' : 'relative',
+                    'top' : '60px',
+                    'background-color' : '#f0f0f5'
+                },
+                persistence = True
+            ),
 
 
             html.Button('Classify', id='button', 

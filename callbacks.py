@@ -21,34 +21,49 @@ from app import app
 @app.callback(
     # the instant name and instant value
     # [Output(component_id = 'fileinfo', component_property = 'children')],
-    [Output(component_id = 'fileinfo', component_property = 'value')],
+    [Output(component_id = 'fileinfo', component_property = 'value'), Output(component_id = 'memory-output', component_property = 'data')],
     [Input('bearing_file_upload', 'contents')],
     [State('bearing_file_upload', 'filename'), State('bearing_file_upload', 'last_modified')]
 )
 def upload_file(contents, filename, filedates):
-    global mainfile
     if filename is None:
-        return '',
+        return None, {}
     elif filename.endswith('.npy') | filename.endswith('.csv') | filename.endswith('.xlsx'):
         pass
     else:
         print('Filetype Not Support')
-        return None,
+        return '', {}
     
 
 
     # fileinfo = [html.Li('Filename : {}'.format(filename)), 
     #             html.Li('Last Modified : {}'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(filedates)))), 
     #             html.Li('Data Size : {:.2f} MB'.format(os.stat('./Formal/'+filename)[-4]/1024/1024))]
-    fileinfo = 'Filename : {}\n\nLast Modified : {}\n\nData Size : {:.2f} MB\n\n'.format(filename, 
-    time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(filedates)), os.stat('./Formal/'+filename)[-4]/1024/1024)
+    fileinfo_dict = {'Filename' : filename, 'Last Modified': time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(filedates)),\
+                    'Data Size' : os.stat('./Formal/'+filename)[-4]/1024/1024}
+
+    fileinfo = 'Filename : {}\n\nLast Modified : {}\n\nData Size : {:.2f} MB\n\n'.format(
+                fileinfo_dict['Filename'], fileinfo_dict['Last Modified'], fileinfo_dict['Data Size'])
 
     # print(len(contents))
 
-    return fileinfo,
+    return fileinfo, fileinfo_dict
 
 # 可以用state當input, 去取得某個物件的狀態
 
+
+
+@app.callback(
+    [Output(component_id = 'fileinfo_page2', component_property = 'value')],
+    [Input('memory-output', 'data')],
+)
+def update_page2(fileinfo_dict):
+    # print(data)
+
+    fileinfo = 'Filename : {}\n\nLast Modified : {}\n\nData Size : {:.2f} MB\n\n'.format(
+                fileinfo_dict['Filename'], fileinfo_dict['Last Modified'], fileinfo_dict['Data Size'])
+
+    return fileinfo,
 
 
 @app.callback(
@@ -60,10 +75,10 @@ def upload_file(contents, filename, filedates):
     [State('bearing_file_upload', 'filename'), State('outlier_detect', 'on')]
 )
 def load_file(n_clicks, filename, outlier_detect_en):
-    print(filename)
-    print("n clicks = ", n_clicks)
-    print("outlier toggle = ", outlier_detect_en)
-    print('state : ', State('bearing_file_upload', 'filename'))
+    # print(filename)
+    # print("n clicks = ", n_clicks)
+    # print("outlier toggle = ", outlier_detect_en)
+    # print('state : ', State('bearing_file_upload', 'filename'))
 
 
     # read file
