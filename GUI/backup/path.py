@@ -1,0 +1,1 @@
+dateinfoPath = '/home/thl/Documents/Database/info/'
